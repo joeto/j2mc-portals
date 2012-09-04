@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -51,42 +52,51 @@ public class J2MC_Portals extends JavaPlugin implements Listener {
 
     public void loadPortalAreas() {
         this.reloadConfig();
-        for (String area : this.getConfig().getStringList("portals")) {
+        for (String area : this.getConfig().getKeys(false)) {
             String path = /*"portals." + */area;
-            int x = this.getConfig().getInt(path + ".x");
-            int y = this.getConfig().getInt(path + ".y");
-            int z = this.getConfig().getInt(path + ".z");
-            Location upperLeft = new Location(this.getServer().getWorlds().get(0), x, y, z);
-
+            int baseX = this.getConfig().getInt(path + ".x", 0);
+            int baseY = this.getConfig().getInt(path + ".y", 0);
+            int baseZ = this.getConfig().getInt(path + ".z", 0);
+            boolean xdim = this.getConfig().getBoolean(path + ".horizontalByX", false);
+            String worldName = this.getConfig().getString("world","world");
+            World world = this.getServer().getWorld(worldName);
+            if(world == null) {
+                world = this.getServer().getWorlds().get(0);
+            }
             HashSet<Location> locations = new HashSet<Location>();
             List<String> shape = this.getConfig().getStringList(path + ".shape");
             //int height = shape.size();
             int width = shape.get(0).length();
-            int curZ = z;
+            int curX = baseX;
+            int curY = baseY + shape.size();
+            int curZ = baseZ;
             for (String line : shape) {
-                if (line.length() != width) {
-                    this.getLogger().info("YOUR CONFIG IS BAD AND YOU SHOULD FEEL BAD. Shutting down plugin.");
-                    this.getPluginLoader().disablePlugin(this);
-                    return;
+                curY--;
+                if(xdim) {
+                    curX = baseX;
+                } else {
+                    curZ = baseZ;
                 }
-                for (int i = 0; i < width; i++) {
-                    if (line.charAt(i) == 'X') {
-                        Location loc = new Location(this.getServer().getWorlds().get(0), x + i, y, curZ);
+                for(char c:line.toCharArray()){
+                    if(xdim) {
+                        curX++;
+                    } else {
+                        curZ++;
+                    }
+                    if(c == 'O'){
+                        Location loc = new Location(world, curX, curY, curZ);
                         locations.add(loc);
-                        loc.getBlock().setType(Material.BEDROCK); //debug
-                        this.getLogger().info("Placed bedrock at " + loc.getX() + " " + loc.getBlockY() + " " + loc.getZ());
+                        loc.getBlock().setTypeId(17);
                     }
                 }
-                curZ++;
             }
 
-            String destination = area;
             String perm = this.getConfig().getString(path + ".permission");
-            if (perm.equals("j2mc.portals.everyone")) {
+            if (!perm.equals("j2mc.portals.everyone")) {
                 this.getServer().getPluginManager().addPermission(new Permission("perm", PermissionDefault.OP));
             }
 
-            this.portalAreas.add(new PortalArea(locations, destination, perm, upperLeft));
+            this.portalAreas.add(new PortalArea(locations, area, perm));
         }
     }
 

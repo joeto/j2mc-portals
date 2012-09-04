@@ -11,7 +11,7 @@ public class PortalArea {
     private String destination;
     private String permission;
 
-    public PortalArea(HashSet<Location> locations, String destination, String permission, Location upperLeft) {
+    public PortalArea(HashSet<Location> locations, String destination, String permission) {
         this.locations = locations;
         this.destination = destination;
         this.permission = permission;
