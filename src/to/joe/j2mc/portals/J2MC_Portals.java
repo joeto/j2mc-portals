@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -43,7 +42,7 @@ public class J2MC_Portals extends JavaPlugin implements Listener {
         if (!(new File(this.getDataFolder(), "config.yml")).exists()) {
             this.saveDefaultConfig();
         }
-
+        this.getServer().getMessenger().registerOutgoingPluginChannel(this, "RubberBand");
         this.getServer().getPluginManager().registerEvents(this, this);
         this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new PortalCheck(), 4, 4);
         for (Player player : this.getServer().getOnlinePlayers()) {
