@@ -69,6 +69,7 @@ public class J2MC_Portals extends JavaPlugin implements Listener {
             int curX = baseX;
             int curY = baseY + shape.size();
             int curZ = baseZ;
+            System.out.println("Shape size: "+shape.size());
             for (String line : shape) {
                 curY--;
                 if(xdim) {
@@ -76,14 +77,17 @@ public class J2MC_Portals extends JavaPlugin implements Listener {
                 } else {
                     curZ = baseZ;
                 }
+                System.out.println("New line ["+line+"] start: "+curX+","+curY+","+curZ);
                 for(char c:line.toCharArray()){
                     if(xdim) {
                         curX++;
                     } else {
                         curZ++;
                     }
+                    System.out.println("Coord "+curX+","+curY+","+curZ+" "+c);
                     if(c == 'O'){
                         Location loc = new Location(world, curX, curY, curZ);
+                        System.out.println("Adding "+loc);
                         locations.add(loc);
                         loc.getBlock().setTypeId(17);
                     }
