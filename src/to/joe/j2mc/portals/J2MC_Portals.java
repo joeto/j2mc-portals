@@ -6,11 +6,13 @@ import java.util.List;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class J2MC_Portals extends JavaPlugin {
+public class J2MC_Portals extends JavaPlugin implements Listener {
 
     public final HashSet<PortalArea> portalAreas = new HashSet<PortalArea>();
 
@@ -20,11 +22,12 @@ public class J2MC_Portals extends JavaPlugin {
             this.saveDefaultConfig();
         }
         
-        this.getServer().getPluginManager().registerEvents(new EventListener(this), this);
+        this.getServer().getPluginManager().registerEvents(this, this);
         this.loadPortalAreas();
     }
     
     public void loadPortalAreas() {
+        this.reloadConfig();
         for(String area : this.getConfig().getStringList("portals")) {
             String path = /*"portals." + */area;
             int x = this.getConfig().getInt(path + ".x");
@@ -64,23 +67,13 @@ public class J2MC_Portals extends JavaPlugin {
         }
     }
     
-    public PortalArea getPortalForLocation(Location loc) {
+    public PortalArea getPortalForPlayer(Player player) {
         for(PortalArea area : this.portalAreas){
-            if(area.isLocationInPortal(loc)){
+            if(area.isPlayerInPortal(player)){
                 return area;
             }
         }
         return null;
     }
     
-    public HashSet<Location> getAllLocations() {
-        HashSet<Location> return_ = new HashSet<Location>();
-        for(PortalArea area : this.portalAreas) {
-            for(Location loc : area.getLocations()) {
-                return_.add(loc);
-            }
-        }
-        return return_;
-    }
-
 }
