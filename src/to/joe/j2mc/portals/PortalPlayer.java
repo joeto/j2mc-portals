@@ -9,7 +9,8 @@ public class PortalPlayer {
     private J2MC_Portals portals;
     private final Player player;
 
-    public PortalPlayer(Player player, boolean inPortal) {
+    public PortalPlayer(Player player, boolean inPortal, J2MC_Portals portals) {
+        this.portals = portals;
         this.player = player;
         this.inPortal = inPortal;
         if (!inPortal) {

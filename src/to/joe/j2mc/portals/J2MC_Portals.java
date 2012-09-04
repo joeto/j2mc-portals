@@ -66,7 +66,6 @@ public class J2MC_Portals extends JavaPlugin implements Listener {
             HashSet<Location> locations = new HashSet<Location>();
             List<String> shape = this.getConfig().getStringList(path + ".shape");
             //int height = shape.size();
-            int width = shape.get(0).length();
             int curX = baseX;
             int curY = baseY + shape.size();
             int curZ = baseZ;
@@ -110,7 +109,7 @@ public class J2MC_Portals extends JavaPlugin implements Listener {
     }
 
     private void addPlayer(Player player) {
-        this.players.add(new PortalPlayer(player, this.getPortalForPlayer(player) != null));
+        this.players.add(new PortalPlayer(player, this.getPortalForPlayer(player) != null, this));
     }
 
     @EventHandler
