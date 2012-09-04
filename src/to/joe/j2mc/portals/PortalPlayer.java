@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 public class PortalPlayer {
     private boolean inPortal;
     private Location lastNonPortal;
-    private J2MC_Portals portals;
+    private final J2MC_Portals portals;
     private final Player player;
 
     public PortalPlayer(Player player, boolean inPortal, J2MC_Portals portals) {
@@ -24,13 +24,13 @@ public class PortalPlayer {
     public boolean check() {
         final PortalArea portal = this.portals.getPortalForPlayer(this.player);
         if ((portal != null) && !this.inPortal) {
-            float yaw = lastNonPortal.getYaw();
+            float yaw = this.lastNonPortal.getYaw();
             if ((yaw += 180) > 360) {
                 yaw -= 360;
             }
-            lastNonPortal.setYaw(yaw);
+            this.lastNonPortal.setYaw(yaw);
             this.player.teleport(this.lastNonPortal);
-            player.sendPluginMessage(this.portals, "RubberBand", portal.getDestination().getBytes());
+            this.player.sendPluginMessage(this.portals, "RubberBand", portal.getDestination().getBytes());
             return true;
         }
         if ((portal == null) && this.inPortal) {
