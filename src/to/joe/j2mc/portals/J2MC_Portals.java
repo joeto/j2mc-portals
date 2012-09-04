@@ -1,6 +1,7 @@
 package to.joe.j2mc.portals;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -53,18 +55,18 @@ public class J2MC_Portals extends JavaPlugin implements Listener {
     public void loadPortalAreas() {
         this.reloadConfig();
         for (String area : this.getConfig().getKeys(false)) {
-            String path = /*"portals." + */area;
-            int baseX = this.getConfig().getInt(path + ".x", 0);
-            int baseY = this.getConfig().getInt(path + ".y", 0);
-            int baseZ = this.getConfig().getInt(path + ".z", 0);
-            boolean xdim = this.getConfig().getBoolean(path + ".horizontalByX", false);
-            String worldName = this.getConfig().getString("world","world");
+            ConfigurationSection portal = getConfig().getConfigurationSection(area);
+            int baseX = portal.getInt("x", 0);
+            int baseY = portal.getInt("y", 0);
+            int baseZ = portal.getInt("z", 0);
+            boolean xdim = portal.getBoolean("horizontalByX", false);
+            String worldName = portal.getString("world","world");
             World world = this.getServer().getWorld(worldName);
             if(world == null) {
                 world = this.getServer().getWorlds().get(0);
             }
             HashSet<Location> locations = new HashSet<Location>();
-            List<String> shape = this.getConfig().getStringList(path + ".shape");
+            List<String> shape = Arrays.asList(portal.getString("shape").split("\n"));
             //int height = shape.size();
             int curX = baseX;
             int curY = baseY + shape.size();
@@ -94,7 +96,7 @@ public class J2MC_Portals extends JavaPlugin implements Listener {
                 }
             }
 
-            String perm = this.getConfig().getString(path + ".permission");
+            String perm = portal.getString("permission");
             if (!perm.equals("j2mc.portals.everyone")) {
                 this.getServer().getPluginManager().addPermission(new Permission("perm", PermissionDefault.OP));
             }
