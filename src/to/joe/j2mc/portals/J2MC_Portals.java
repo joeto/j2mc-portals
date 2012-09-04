@@ -2,19 +2,38 @@ package to.joe.j2mc.portals;
 
 import java.io.File;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class J2MC_Portals extends JavaPlugin implements Listener {
 
-    public final HashSet<PortalArea> portalAreas = new HashSet<PortalArea>();
+    private final HashSet<PortalArea> portalAreas = new HashSet<PortalArea>();
+    private final HashSet<PortalPlayer> players = new HashSet<PortalPlayer>();
+
+    private class PortalCheck implements Runnable {
+        @Override
+        public void run() {
+            Iterator<PortalPlayer> iterator = players.iterator();
+            while (iterator.hasNext()) {
+                PortalPlayer player = iterator.next();
+                if (player.check()) {
+                    iterator.remove();
+                    return;
+                }
+            }
+        }
+    }
 
     @Override
     public void onEnable() {
@@ -23,6 +42,10 @@ public class J2MC_Portals extends JavaPlugin implements Listener {
         }
 
         this.getServer().getPluginManager().registerEvents(this, this);
+        this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new PortalCheck(), 4, 4);
+        for (Player player : this.getServer().getOnlinePlayers()) {
+            this.addPlayer(player);
+        }
         this.loadPortalAreas();
     }
 
@@ -76,4 +99,24 @@ public class J2MC_Portals extends JavaPlugin implements Listener {
         return null;
     }
 
+    private void addPlayer(Player player) {
+        this.players.add(new PortalPlayer(player, this.getPortalForPlayer(player) != null));
+    }
+
+    @EventHandler
+    public void join(PlayerJoinEvent event) {
+        this.addPlayer(event.getPlayer());
+    }
+
+    @EventHandler
+    public void quit(PlayerQuitEvent event) {
+        Iterator<PortalPlayer> iterator = players.iterator();
+        while (iterator.hasNext()) {
+            PortalPlayer player = iterator.next();
+            if (player.getName().equals(event.getPlayer().getName())) {
+                iterator.remove();
+                return;
+            }
+        }
+    }
 }

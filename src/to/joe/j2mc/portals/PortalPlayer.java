@@ -17,15 +17,29 @@ public class PortalPlayer {
         }
     }
 
-    public void check() {
+    /**
+     * @return true if player has teleported and should be untracked
+     */
+    public boolean check() {
         final PortalArea portal = this.portals.getPortalForPlayer(this.player);
         if ((portal != null) && !this.inPortal) {
+            float yaw = lastNonPortal.getYaw();
+            if ((yaw += 180) > 360) {
+                yaw -= 360;
+            }
+            lastNonPortal.setYaw(yaw);
             this.player.teleport(this.lastNonPortal);
             player.sendPluginMessage(this.portals, "RubberBand", portal.getDestination().getBytes());
+            return true;
         }
         if ((portal == null) && this.inPortal) {
             this.inPortal = false;
             this.lastNonPortal = this.player.getLocation();
         }
+        return false;
+    }
+
+    public String getName() {
+        return this.player.getName();
     }
 }
