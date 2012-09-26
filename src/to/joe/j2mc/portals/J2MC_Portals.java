@@ -81,7 +81,6 @@ public class J2MC_Portals extends JavaPlugin implements Listener {
                     if (c == 'O') {
                         final Location loc = new Location(world, curX, curY, curZ);
                         locations.add(loc);
-                        loc.getBlock().setTypeId(17);
                     }
                     if (xdim) {
                         curX++;
